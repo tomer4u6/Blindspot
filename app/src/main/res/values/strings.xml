@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Blindspot</string>
+    <string name="welcomeText">Welcome to Blindspot app.
+        This app is intended for blind people.
+        You can use this app to scan RF ID and NFC tags from clothes in order to hear the information about them.
+        You can also manage your own wardrobe with this app.
+        In this screen you have two buttons and each changes the screen, where you can login or register to the app.
+    </string>
 </resources>
