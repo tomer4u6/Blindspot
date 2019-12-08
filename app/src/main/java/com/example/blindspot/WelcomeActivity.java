@@ -2,19 +2,20 @@ package com.example.blindspot;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.view.View;
 
 import java.util.Locale;
 
 
 /**
  * @author Tomer Ben Ari
- * @version 0.2.0
+ * @version 0.3.0
  * @since 0.2.0 (05/12/2019)
- * short description:
- * This activity is the first one the user sees when he opens the app.
- * You can get from it to the Login activity or Register activity.
+ *
+ * Welcome Activity
  */
 
 
@@ -45,5 +46,10 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onPause();
 
         tts.stop();
+    }
+
+    public void moveToRegister(View view) {
+        Intent intent = new Intent(WelcomeActivity.this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
