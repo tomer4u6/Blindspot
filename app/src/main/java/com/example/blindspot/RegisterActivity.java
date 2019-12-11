@@ -24,7 +24,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.3.0
+ * @version 0.3.1
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -38,6 +38,8 @@ public class RegisterActivity extends AppCompatActivity {
     String name, email, password, uid;
     User userdb;
     Boolean stayConnected;
+
+    char[] invalidChars = new char[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,13 @@ public class RegisterActivity extends AppCompatActivity {
         checkBox_stayConnected = (CheckBox)findViewById(R.id.checkBox_stayConnected);
 
         stayConnected = false;
+
+        invalidChars[0] = '.';
+        invalidChars[1] = '$';
+        invalidChars[2] = '#';
+        invalidChars[3] = '[';
+        invalidChars[4] = ']';
+        invalidChars[5] = '/';
 
 
     }
@@ -123,6 +132,18 @@ public class RegisterActivity extends AppCompatActivity {
             valid = false;
         } else {
             editText_name.setError(null);
+        }
+
+        if(valid) {
+            for (int i = 0; i < invalidChars.length; i++) {
+                if (name.contains(Character.toString(invalidChars[i]))) {
+                    editText_name.setError("Invalid Character.");
+                    valid = false;
+                    break;
+                } else {
+                    editText_name.setError(null);
+                }
+            }
         }
 
         String email = editText_email.getText().toString();
