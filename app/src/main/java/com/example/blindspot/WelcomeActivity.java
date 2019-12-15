@@ -12,7 +12,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.3.1
+ * @version 0.4.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -50,6 +50,11 @@ public class WelcomeActivity extends AppCompatActivity {
 
     public void moveToRegister(View view) {
         Intent intent = new Intent(WelcomeActivity.this, RegisterActivity.class);
+        startActivity(intent);
+    }
+
+    public void moveToLogin(View view) {
+        Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
         startActivity(intent);
     }
 }

@@ -24,7 +24,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.3.1
+ * @version 0.4.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -37,7 +37,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     String name, email, password, uid;
     User userdb;
-    Boolean stayConnected;
 
     char[] invalidChars = new char[6];
 
@@ -54,7 +53,6 @@ public class RegisterActivity extends AppCompatActivity {
         editText_pass = (EditText)findViewById(R.id.editText_pass);
         checkBox_stayConnected = (CheckBox)findViewById(R.id.checkBox_stayConnected);
 
-        stayConnected = false;
 
         invalidChars[0] = '.';
         invalidChars[1] = '$';
@@ -68,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     /**
      * Creating a new user in Firebase
-     *<p>
+     * <p>
      * Registering a new user to Firebase using Firebase Auth with Email and Password
      * Adding the new User object to Firebase Realtime Database
      * <p>
@@ -98,12 +96,12 @@ public class RegisterActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = settings.edit();
                             editor.putBoolean("stayConnected", checkBox_stayConnected.isChecked());
                             editor.commit();
-                            Log.d("RegisterActivity", "creatUserWithEmail:success");
+                            Log.d("RegisterActivity", "createUserWithEmail:success");
                             FirebaseUser user = refAuth.getCurrentUser();
                             uid = user.getUid();
                             userdb = new User(name,email,uid);
                             refUsers.child(name).setValue(userdb);
-                            Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_LONG).show();
                         }
                         else{
                             if (task.getException() instanceof FirebaseAuthUserCollisionException)
@@ -118,7 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * Validates if the user input is not missing
+     * Checks if the user input is not missing and valid
      * <p>
      *
      * @return boolean This returns false if input is missing and returns true if noting is missing
