@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 import static com.example.blindspot.FBref.refAuth;
@@ -24,7 +26,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.4.0
+ * @version 0.5.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -100,8 +102,10 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseUser user = refAuth.getCurrentUser();
                             uid = user.getUid();
                             userdb = new User(name,email,uid);
-                            refUsers.child(name).setValue(userdb);
+                            refUsers.child(email.replace("."," ")).setValue(userdb);
                             Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                            startActivity(intent);
                         }
                         else{
                             if (task.getException() instanceof FirebaseAuthUserCollisionException)

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,7 +22,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.4.0
+ * @version 0.5.0
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity
@@ -74,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                     editor.commit();
                     Log.d("LoginActivity", "signInUserWithEmail:success");
                     Toast.makeText(LoginActivity.this, "Login succeeded", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
                 }
                 else{
                     Log.d("LoginActivity", "signInUserWithEmail:fail");
