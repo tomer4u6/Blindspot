@@ -26,7 +26,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.5.0
+ * @version 0.5.1
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -69,9 +69,9 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Creating a new user in Firebase
      * <p>
-     * Registering a new user to Firebase using Firebase Auth with Email and Password
-     * Adding the new User object to Firebase Realtime Database
-     * <p>
+     *     Registering a new user to Firebase using Firebase Auth with Email and Password
+     *     Adding the new User object to Firebase Realtime Database
+     * </p>
      *
      * @param name User name
      * @param email User email
@@ -108,8 +108,12 @@ public class RegisterActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                         else{
-                            if (task.getException() instanceof FirebaseAuthUserCollisionException)
+                            if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                 Toast.makeText(RegisterActivity.this, "User with e-mail already exist!", Toast.LENGTH_SHORT).show();
+                            }
+                            else if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
+                                Toast.makeText(RegisterActivity.this, "Password is too weak!", Toast.LENGTH_SHORT).show();
+                            }
                             else{
                                 Log.w("RegisterActivity", "createUserWithEmail:failure", task.getException());
                                 Toast.makeText(RegisterActivity.this, "User creation failed.", Toast.LENGTH_SHORT).show();
@@ -121,7 +125,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     /**
      * Checks if the user input is not missing and valid
-     * <p>
      *
      * @return boolean This returns false if input is missing and returns true if noting is missing
      */

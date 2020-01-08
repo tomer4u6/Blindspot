@@ -22,7 +22,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.5.0
+ * @version 0.5.1
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity
@@ -47,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Login to Firebase with email and password
-     * <p>
      *
      * @param email User email
      * @param password User password
@@ -89,7 +88,6 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Checks if the user input is not missing
-     * <p>
      *
      * @return boolean This returns false if input is missing and returns true if noting is missing
      */

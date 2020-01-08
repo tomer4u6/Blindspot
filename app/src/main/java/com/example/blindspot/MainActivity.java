@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -16,7 +18,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.5.0
+ * @version 0.5.1
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -25,7 +27,13 @@ import static com.example.blindspot.FBref.refUsers;
 public class MainActivity extends AppCompatActivity {
 
     TextView textView_username;
-    User user;
+    User user = new User();
+
+
+    /**
+     * On activity create gets the user from Firebase and sets username on TextView
+     *
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,32 +41,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView_username = (TextView)findViewById(R.id.textView_username);
-    }
-
-    /**
-     * On activity start gets the current user and displays the username
-     * <p>
-     */
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         FirebaseUser firebaseUser = refAuth.getCurrentUser();
         refUsers.child(firebaseUser.getEmail().replace("."," "))
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                if(user != null){
-                    textView_username.setText(user.getName());
-                }
-            }
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                       user.copyUser(dataSnapshot.getValue(User.class));
+                        textView_username.setText(user.getName());
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                    }
+                });
+
+    }
+
+    public void goToScanner(View view) {
     }
 }
