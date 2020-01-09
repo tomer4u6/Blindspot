@@ -3,6 +3,7 @@ package com.example.blindspot;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.7.0
+ * @version 0.8.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -50,13 +51,16 @@ public class MainActivity extends AppCompatActivity {
 
         textView_username = (TextView)findViewById(R.id.textView_username);
 
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Login",
+                "Connecting...",true);
         FirebaseUser firebaseUser = refAuth.getCurrentUser();
         refUsers.child(firebaseUser.getEmail().replace("."," "))
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                        user.copyUser(dataSnapshot.getValue(User.class));
-                        textView_username.setText(user.getName());
+                        textView_username.setText("Welcome "+user.getName());
+                        progressDialog.dismiss();
                         tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                             @Override
                             public void onInit(int status) {
