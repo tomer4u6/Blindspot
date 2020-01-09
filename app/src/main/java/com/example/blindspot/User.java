@@ -3,7 +3,7 @@ package com.example.blindspot;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.5.1
+ * @version 0.6.0
  * @since 0.3.0 (08/12/2019)
  *
  * User class
