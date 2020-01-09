@@ -22,7 +22,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.6.0
+ * @version 0.7.0
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity

@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.6.0
+ * @version 0.7.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity

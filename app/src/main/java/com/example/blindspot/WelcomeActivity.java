@@ -3,6 +3,7 @@ package com.example.blindspot;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -12,7 +13,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.6.0
+ * @version 0.7.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -30,7 +31,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("");
 
-        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        /*tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR){
@@ -38,14 +39,26 @@ public class WelcomeActivity extends AppCompatActivity {
                     tts.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
-        });
+        });*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        tts.stop();
+        //tts.stop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        Boolean isConnected = settings.getBoolean("stayConnected",false);
+        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+        if(isConnected){
+            startActivity(intent);
+        }
     }
 
     public void moveToRegister(View view) {

@@ -26,7 +26,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.6.0
+ * @version 0.7.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
