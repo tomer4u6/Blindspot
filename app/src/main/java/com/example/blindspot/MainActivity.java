@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +26,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.8.0
+ * @version 0.9.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -109,6 +110,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Toast.makeText(this, "Please log out properly.", Toast.LENGTH_SHORT).show();
+    }
 
+    public void goToWardrobe(View view) {
+        Intent intent = new Intent(MainActivity.this, WardrobeActivity.class);
+        startActivity(intent);
     }
 }

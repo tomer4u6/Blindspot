@@ -25,7 +25,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.8.0
+ * @version 0.9.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -55,7 +55,7 @@ public class ScannerActivity extends AppCompatActivity {
 
     /**
      * Gets the cloth code from another device via Android Beam,
-     * Retrieves the cloth information from Firebase according to code,
+     * retrieves the cloth information from Firebase according to code,
      * displays the information in TextView,
      * reads the information out loud
      *
