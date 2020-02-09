@@ -3,9 +3,11 @@ package com.example.blindspot;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
@@ -26,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.9.0
+ * @version 0.10.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     User user = new User();
 
     TextToSpeech tts;
+
+    NfcAdapter nfcAdapter;
 
 
     /**
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView_username = (TextView)findViewById(R.id.textView_username);
+
 
         final ProgressDialog progressDialog = ProgressDialog.show(this,"Login",
                 "Connecting...",true);
@@ -116,5 +121,27 @@ public class MainActivity extends AppCompatActivity {
     public void goToWardrobe(View view) {
         Intent intent = new Intent(MainActivity.this, WardrobeActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 }

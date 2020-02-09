@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -25,7 +26,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.9.0
+ * @version 0.10.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -39,7 +40,7 @@ public class ScannerActivity extends AppCompatActivity {
     TextToSpeech tts;
 
     NfcAdapter nfcAdapter;
-    AlertDialog.Builder adb;
+
 
 
 
@@ -49,80 +50,36 @@ public class ScannerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanner);
 
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
-
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        textView_clothInfo.setText("Waiting for NDEF Message");
     }
 
-    /**
-     * Gets the cloth code from another device via Android Beam,
-     * retrieves the cloth information from Firebase according to code,
-     * displays the information in TextView,
-     * reads the information out loud
-     *
-     */
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (nfcAdapter != null && nfcAdapter.isEnabled() && nfcAdapter.isNdefPushEnabled()) {
-            Intent intent = getIntent();
-            if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-                Parcelable[] rawMessages = intent.getParcelableArrayExtra(
-                        NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-                NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
-                clothCode = new String(message.getRecords()[0].getPayload());
-                refClothes.child(clothCode).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        type = dataSnapshot.child("Type").getValue().toString();
-                        size = dataSnapshot.child("Size").getValue().toString();
-                        color = dataSnapshot.child("Color").getValue().toString();
-                        textView_clothInfo.setText(
-                                "Type: " + type + "\n"
-                                        + "Size: " + size + "\n"
-                                        + "Color:" + color
-                        );
-
-                        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                            @Override
-                            public void onInit(int status) {
-                                if (status != TextToSpeech.ERROR) {
-                                    tts.setLanguage(Locale.US);
-                                    tts.speak(size + " " + color + " " + type, TextToSpeech.QUEUE_FLUSH, null);
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-
-            } else
-                textView_clothInfo.setText("Waiting for NDEF Message");
-
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter != null && nfcAdapter.isEnabled() && nfcAdapter.isNdefPushEnabled()){
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         }
         else {
             Toast.makeText(this, "NFC or Android Beam is not active :(", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(this);
+            builder.setTitle("Open NFC settings");
+            builder.setMessage("Press OPEN to open NFC settings:");
+            builder.setCancelable(false);
 
-            adb = new AlertDialog.Builder(this);
-            adb.setTitle("Open NFC settings");
-            adb.setMessage("Press OPEN to open NFC settings:");
-            adb.setCancelable(false);
-
-            adb.setPositiveButton("OPEN", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("OPEN", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                    dialog.dismiss();
                 }
             });
 
-            adb.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     finish();
@@ -130,8 +87,70 @@ public class ScannerActivity extends AppCompatActivity {
                 }
             });
 
-            AlertDialog ad = adb.create();
-            ad.show();
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
+    }
+
+
+    /**
+     * Gets the clothing item code from another device via Android Beam,
+     * retrieves the information from Firebase according to code,
+     * displays the information in TextView,
+     * reads the information out loud
+     *
+     * @param intent
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Parcelable[] rawMessages = intent.getParcelableArrayExtra(
+                    NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+            NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
+            clothCode = new String(message.getRecords()[0].getPayload());
+            refClothes.child(clothCode).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    type = dataSnapshot.child("Type").getValue().toString();
+                    size = dataSnapshot.child("Size").getValue().toString();
+                    color = dataSnapshot.child("Color").getValue().toString();
+                    textView_clothInfo.setText(
+                            "Type: " + type + "\n"
+                                    + "Size: " + size + "\n"
+                                    + "Color:" + color
+                    );
+
+                    tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                        @Override
+                        public void onInit(int status) {
+                            if (status != TextToSpeech.ERROR) {
+                                tts.setLanguage(Locale.US);
+                                tts.speak(size + " " + color + " " + type, TextToSpeech.QUEUE_FLUSH, null);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+
+        }
+        else {
+            textView_clothInfo.setText("Waiting for NDEF Message");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
     }
 }

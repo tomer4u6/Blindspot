@@ -3,9 +3,11 @@ package com.example.blindspot;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.9.0
+ * @version 0.10.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -34,6 +36,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    NfcAdapter nfcAdapter;
     EditText editText_name, editText_email, editText_pass;
     CheckBox checkBox_stayConnected;
 
@@ -176,5 +179,27 @@ public class RegisterActivity extends AppCompatActivity {
         password = editText_pass.getText().toString();
 
         createAccount(name,email,password);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 }
