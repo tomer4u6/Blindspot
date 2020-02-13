@@ -36,13 +36,13 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.10.0
+ * @version 0.11.0
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
  */
 
-public class WardrobeActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class WardrobeActivity extends AppCompatActivity {
     ListView listView_wardrobe;
     Spinner spinner_type;
 
@@ -88,9 +88,6 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
         listView_wardrobe = (ListView)findViewById(R.id.listView_wardrobe);
         spinner_type = (Spinner)findViewById(R.id.spinner_type);
 
-
-        listView_wardrobe.setOnItemClickListener(this);
-        listView_wardrobe.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         adapter_spinner = new ArrayAdapter<String>(this,
                 R.layout.support_simple_spinner_dropdown_item, types);
@@ -178,59 +175,6 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
         query.removeEventListener(valueEventListener);
     }
 
-    /**
-     * When item is selected from ListView: creates AlertDialog,
-     * the user can choose to delete the selected clothing item from Firebase
-     *
-     * @param parent
-     * @param view
-     * @param position
-     * @param id
-     */
-    @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int position, long id) {
-        if(parent.getId() == R.id.listView_wardrobe){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Removing clothing item from your wardrobe:");
-            builder.setMessage("Would you like to delete the selected clothing item?");
-            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    value = codesList.get(position);
-                    refWardrobe_user.child(value).child("Amount").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            amount = dataSnapshot.getValue(Long.class);
-                            amount -= 1;
-                            if (amount == 0){
-                                refWardrobe_user.child(value).removeValue();
-                            }
-                            else {
-                                refWardrobe_user.child(value).child("Amount").setValue(amount);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    Toast.makeText(WardrobeActivity.this,
-                            "Deleting succeeded.", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                }
-            });
-            builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        }
-    }
 
     @Override
     protected void onResume() {
@@ -270,11 +214,11 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
 
 
     /**
-     * Adding new clothing item to wardrobe on Firebase
+     * Adding/Removing clothing item to/from wardrobe on Firebase
      * <p>
      *     Gets the clothing item code from another device via Android Beam,
      *     retrieves the information from Firebase according to code,
-     *     opens AlertDialog for adding the item to wardrobe
+     *     opens AlertDialog for adding or removing the item
      * </p>
      *
      * @param intent
@@ -292,7 +236,7 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
             clothCode = new String(message.getRecords()[0].getPayload());
             refClothes.child(clothCode).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     type = dataSnapshot.child("Type").getValue(String.class);
                     size = dataSnapshot.child("Size").getValue(String.class);
                     color = dataSnapshot.child("Color").getValue(String.class);
@@ -307,15 +251,17 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
                         }
                     });
 
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(WardrobeActivity.this);
-                    builder.setTitle("Adding new cloth item to Firebase");
-                    builder.setMessage("Please confirm adding this cloth item to your wardrobe: " +
-                            size + ";" + color + ";" + type);
+                    builder.setTitle("Adding/Removing clothing item");
+                    builder.setMessage(size + ";" + color + ";" + type +
+                            "\n\nSelect Add to add this item to your wardrobe or Remove to remove it from your wardrobe if it contains this item");
                     builder.setCancelable(false);
 
-                    builder.setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            spinner_type.setSelection(10);
                             refWardrobe_user.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -330,6 +276,7 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
                                         refWardrobe_user.child(clothCode).child("Size").setValue(size);
                                         refWardrobe_user.child(clothCode).child("Amount").setValue(Long.valueOf(1));
                                     }
+                                    Toast.makeText(WardrobeActivity.this, "Adding succeeded.", Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
@@ -341,7 +288,50 @@ public class WardrobeActivity extends AppCompatActivity implements AdapterView.O
                         }
                     });
 
-                    builder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
+
+                    builder.setNegativeButton("Remove", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            refWardrobe_user.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.hasChild(clothCode)){
+                                        refWardrobe_user.child(clothCode).child("Amount").addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                amount = dataSnapshot.getValue(Long.class);
+                                                amount -= 1;
+                                                if (amount == 0){
+                                                    refWardrobe_user.child(clothCode).removeValue();
+                                                }
+                                                else {
+                                                    refWardrobe_user.child(clothCode).child("Amount").setValue(amount);
+                                                }
+                                                Toast.makeText(WardrobeActivity.this, "Removing succeeded.", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        Toast.makeText(WardrobeActivity.this, "Your wardrobe doesn't contain this item!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            dialog.dismiss();
+                        }
+                    });
+
+                    builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();

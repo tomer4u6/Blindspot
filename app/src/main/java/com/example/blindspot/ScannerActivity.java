@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +27,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.10.0
+ * @version 0.11.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -35,7 +36,7 @@ import static com.example.blindspot.FBref.refClothes;
 public class ScannerActivity extends AppCompatActivity {
     TextView textView_clothInfo;
     String clothCode;
-    String type,size,color;
+    String type,size,color,fullInfo,linkString;
 
     TextToSpeech tts;
 
@@ -51,6 +52,7 @@ public class ScannerActivity extends AppCompatActivity {
 
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
         textView_clothInfo.setText("Waiting for NDEF Message");
+        fullInfo = null;
     }
 
 
@@ -113,9 +115,11 @@ public class ScannerActivity extends AppCompatActivity {
             refClothes.child(clothCode).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    type = dataSnapshot.child("Type").getValue().toString();
-                    size = dataSnapshot.child("Size").getValue().toString();
-                    color = dataSnapshot.child("Color").getValue().toString();
+                    type = dataSnapshot.child("Type").getValue(String.class);
+                    size = dataSnapshot.child("Size").getValue(String.class);
+                    color = dataSnapshot.child("Color").getValue(String.class);
+                    linkString = dataSnapshot.child("Uri").getValue(String.class);
+                    fullInfo = size + " " + color + " " + type;
                     textView_clothInfo.setText(
                             "Type: " + type + "\n"
                                     + "Size: " + size + "\n"
@@ -143,6 +147,7 @@ public class ScannerActivity extends AppCompatActivity {
         }
         else {
             textView_clothInfo.setText("Waiting for NDEF Message");
+            fullInfo = null;
         }
     }
 
@@ -152,5 +157,20 @@ public class ScannerActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    public void shareInfo(View view) {
+        if(fullInfo!=null){
+
+            Intent sendIntent = new Intent();
+
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.setType("text/plain");
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "My item info");
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "I WANT TO BUY THIS NEW ITEM: \n" + fullInfo + "\n\n" + linkString);
+
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            startActivity(shareIntent);
+        }
     }
 }
