@@ -27,7 +27,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.11.0
+ * @version 0.11.1
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
