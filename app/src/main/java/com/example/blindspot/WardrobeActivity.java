@@ -36,7 +36,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.11.1
+ * @version 0.12.0
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -107,11 +107,8 @@ public class WardrobeActivity extends AppCompatActivity {
                 codesList.clear();
                 for (DataSnapshot childSnapShot : dataSnapshot.getChildren()){
                     String code = childSnapShot.getKey();
-                    String type = childSnapShot.child("Type").getValue(String.class);
-                    String size = childSnapShot.child("Size").getValue(String.class);
-                    String color = childSnapShot.child("Color").getValue(String.class);
-                    String amount = String.valueOf(childSnapShot.child("Amount").getValue(Long.class));
-                    String value = size + ";" + color + ";" + type + ";" + amount + " pcs.";
+                    Cloth cloth = childSnapShot.getValue(Cloth.class);
+                    String value = cloth.toString();
                     wardrobeList.add(value);
                     codesList.add(code);
                 }
@@ -148,7 +145,7 @@ public class WardrobeActivity extends AppCompatActivity {
                     query.addValueEventListener(valueEventListener);
                 }
                 else {
-                    query = refWardrobe_user.orderByChild("Type")
+                    query = refWardrobe_user.orderByChild("type")
                             .equalTo(types[position]);
                     query.addValueEventListener(valueEventListener);
                 }
@@ -266,15 +263,13 @@ public class WardrobeActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if(dataSnapshot.hasChild(clothCode)){
-                                        amount = dataSnapshot.child(clothCode).child("Amount").getValue(Long.class);
+                                        amount = dataSnapshot.child(clothCode).getValue(Cloth.class).getAmount();
                                         amount += 1;
-                                        refWardrobe_user.child(clothCode).child("Amount").setValue(amount);
+                                        refWardrobe_user.child(clothCode).child("amount").setValue(amount);
                                     }
                                     else {
-                                        refWardrobe_user.child(clothCode).child("Type").setValue(type);
-                                        refWardrobe_user.child(clothCode).child("Color").setValue(color);
-                                        refWardrobe_user.child(clothCode).child("Size").setValue(size);
-                                        refWardrobe_user.child(clothCode).child("Amount").setValue(Long.valueOf(1));
+                                        Cloth cloth = new Cloth(type,color,size,1L);
+                                        refWardrobe_user.child(clothCode).setValue(cloth);
                                     }
                                     Toast.makeText(WardrobeActivity.this, "Adding succeeded.", Toast.LENGTH_SHORT).show();
                                 }
@@ -297,16 +292,15 @@ public class WardrobeActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if(dataSnapshot.hasChild(clothCode)){
-                                        refWardrobe_user.child(clothCode).child("Amount").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        refWardrobe_user.child(clothCode).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                amount = dataSnapshot.getValue(Long.class);
-                                                amount -= 1;
-                                                if (amount == 0){
+                                                amount = dataSnapshot.getValue(Cloth.class).getAmount();
+                                                amount = amount - 1;
+                                                if (amount == 0) {
                                                     refWardrobe_user.child(clothCode).removeValue();
-                                                }
-                                                else {
-                                                    refWardrobe_user.child(clothCode).child("Amount").setValue(amount);
+                                                } else {
+                                                    refWardrobe_user.child(clothCode).child("amount").setValue(amount);
                                                 }
                                                 Toast.makeText(WardrobeActivity.this, "Removing succeeded.", Toast.LENGTH_SHORT).show();
                                             }

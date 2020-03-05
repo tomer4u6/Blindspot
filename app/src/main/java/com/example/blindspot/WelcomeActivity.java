@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.11.1
+ * @version 0.12.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
