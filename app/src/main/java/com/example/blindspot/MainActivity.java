@@ -28,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.0
+ * @version 0.12.1
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
             Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
             startActivity(intent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -115,7 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(this, "Please log out properly.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Please log out properly by pressing 'Log Out' from the menu.",
+                Toast.LENGTH_SHORT).show();
     }
 
     public void goToWardrobe(View view) {

@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.0
+ * @version 0.12.1
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -35,7 +35,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("");
 
-        /*tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR){
@@ -43,7 +43,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     tts.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
-        });*/
+        });
     }
 
     @Override
@@ -61,7 +61,10 @@ public class WelcomeActivity extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
 
-        //tts.stop();
+        if(tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -69,17 +72,19 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onNewIntent(intent);
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
-        Boolean isConnected = settings.getBoolean("stayConnected",false);
-        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+        boolean isConnected = settings.getBoolean("stayConnected",false);
         if(isConnected){
+            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
         }
     }
+
 
     public void moveToRegister(View view) {
         Intent intent = new Intent(WelcomeActivity.this, RegisterActivity.class);

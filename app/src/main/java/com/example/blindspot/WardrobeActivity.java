@@ -36,7 +36,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.0
+ * @version 0.12.1
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
