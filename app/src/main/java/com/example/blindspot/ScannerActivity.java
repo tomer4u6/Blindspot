@@ -27,7 +27,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -38,7 +38,7 @@ public class ScannerActivity extends AppCompatActivity {
     String clothCode;
     String type,size,color,fullInfo,linkString;
 
-    TextToSpeech tts;
+    TextToSpeech textToSpeech;
 
     NfcAdapter nfcAdapter;
 
@@ -126,12 +126,12 @@ public class ScannerActivity extends AppCompatActivity {
                                     + "Color:" + color
                     );
 
-                    tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                         @Override
                         public void onInit(int status) {
                             if (status != TextToSpeech.ERROR) {
-                                tts.setLanguage(Locale.US);
-                                tts.speak(size + " " + color + " " + type, TextToSpeech.QUEUE_FLUSH, null);
+                                textToSpeech.setLanguage(Locale.US);
+                                textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
                             }
                         }
                     });
@@ -157,6 +157,11 @@ public class ScannerActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
+
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     public void shareInfo(View view) {

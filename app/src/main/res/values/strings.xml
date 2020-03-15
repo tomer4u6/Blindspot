@@ -3,4 +3,14 @@
     <string name="welcomeText">Welcome to Blindspot app.
         Select Register or Login below.
     </string>
+
+    <string name="registerText">Please register to the app by entering Name, Email and Password."
+        You can select to stay connected below.
+    </string>
+
+    <string name="loginText">Please login to the app by entering Email and Password.
+        You can select to stay connected below.
+    </string>
+
+    <string name="mainText">You can use the Scanner or manage your wardrobe. Select one of them below.</string>
 </resources>

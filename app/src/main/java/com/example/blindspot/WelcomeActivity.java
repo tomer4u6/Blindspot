@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -24,7 +24,7 @@ import java.util.Locale;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    TextToSpeech tts;
+    TextToSpeech textToSpeech;
     NfcAdapter nfcAdapter;
 
 
@@ -33,14 +33,13 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        getSupportActionBar().setTitle("");
 
-        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR){
-                    tts.setLanguage(Locale.US);
-                    tts.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+                    textToSpeech.setLanguage(Locale.US);
+                    textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         });
@@ -61,9 +60,9 @@ public class WelcomeActivity extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
 
-        if(tts != null){
-            tts.stop();
-            tts.shutdown();
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
         }
     }
 

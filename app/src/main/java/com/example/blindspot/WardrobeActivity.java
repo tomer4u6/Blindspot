@@ -36,7 +36,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -47,7 +47,6 @@ public class WardrobeActivity extends AppCompatActivity {
     Spinner spinner_type;
 
     ArrayList<String> wardrobeList = new ArrayList<String>();
-    ArrayList<String> codesList = new ArrayList<String>();
 
     ArrayAdapter<String> adapter_listView;
     ArrayAdapter<String> adapter_spinner;
@@ -70,11 +69,11 @@ public class WardrobeActivity extends AppCompatActivity {
     ValueEventListener valueEventListener;
     Query query;
 
-    String clothCode,value;
-    String type,size,color;
+    String clothCode;
+    String type, size, color, fullInfo;
     Long amount;
 
-    TextToSpeech tts;
+    TextToSpeech textToSpeech;
 
     NfcAdapter nfcAdapter;
 
@@ -104,13 +103,11 @@ public class WardrobeActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 wardrobeList.clear();
-                codesList.clear();
                 for (DataSnapshot childSnapShot : dataSnapshot.getChildren()){
                     String code = childSnapShot.getKey();
                     Cloth cloth = childSnapShot.getValue(Cloth.class);
                     String value = cloth.toString();
                     wardrobeList.add(value);
-                    codesList.add(code);
                 }
                 adapter_listView = new ArrayAdapter<String>(WardrobeActivity.this,
                         R.layout.support_simple_spinner_dropdown_item, wardrobeList);
@@ -238,12 +235,15 @@ public class WardrobeActivity extends AppCompatActivity {
                     size = dataSnapshot.child("Size").getValue(String.class);
                     color = dataSnapshot.child("Color").getValue(String.class);
 
-                    tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    fullInfo = size + " " + color + " " + type;
+
+
+                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                         @Override
                         public void onInit(int status) {
                             if (status != TextToSpeech.ERROR) {
-                                tts.setLanguage(Locale.US);
-                                tts.speak(size + " " + color + " " + type, TextToSpeech.QUEUE_FLUSH, null);
+                                textToSpeech.setLanguage(Locale.US);
+                                textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
                             }
                         }
                     });
@@ -251,7 +251,7 @@ public class WardrobeActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(WardrobeActivity.this);
                     builder.setTitle("Adding/Removing clothing item");
-                    builder.setMessage(size + ";" + color + ";" + type +
+                    builder.setMessage(fullInfo +
                             "\n\nSelect Add to add this item to your wardrobe or Remove to remove it from your wardrobe if it contains this item");
                     builder.setCancelable(false);
 

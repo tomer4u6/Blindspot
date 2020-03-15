@@ -28,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textView_username;
     User user = new User();
 
-    TextToSpeech tts;
+    TextToSpeech textToSpeech;
 
     NfcAdapter nfcAdapter;
 
@@ -65,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                        user.copyUser(dataSnapshot.getValue(User.class));
-                        textView_username.setText("Welcome "+user.getName());
+                        textView_username.setText("Welcome "+user.getName()+".");
                         progressDialog.dismiss();
-                        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                             @Override
                             public void onInit(int status) {
                                 if(status != TextToSpeech.ERROR){
-                                    tts.setLanguage(Locale.US);
-                                    tts.speak( "Welcome "+user.getName() ,TextToSpeech.QUEUE_FLUSH, null);
+                                    textToSpeech.setLanguage(Locale.US);
+                                    textToSpeech.speak( "Welcome "+user.getName()+". " + getString(R.string.mainText) ,TextToSpeech.QUEUE_FLUSH, null);
                                 }
                             }
                         });
@@ -140,6 +140,11 @@ public class MainActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
+
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     @Override

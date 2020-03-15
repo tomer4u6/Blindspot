@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.12.0 (05/03/2020)
  *
  * Cloth class

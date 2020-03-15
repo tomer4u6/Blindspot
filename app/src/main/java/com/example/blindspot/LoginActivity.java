@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -20,11 +21,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
+import java.util.Locale;
+
 import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity
@@ -37,12 +40,24 @@ public class LoginActivity extends AppCompatActivity {
     EditText editText_login_email, editText_login_pass;
     CheckBox checkBox_login_stayConnected;
 
+    TextToSpeech textToSpeech;
+
     String email, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.US);
+                    textToSpeech.speak(getString(R.string.loginText), TextToSpeech.QUEUE_FLUSH, null);
+                }
+            }
+        });
 
         editText_login_email = (EditText)findViewById(R.id.editText_login_email);
         editText_login_pass = (EditText)findViewById(R.id.editText_login_pass);
@@ -140,6 +155,11 @@ public class LoginActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
+
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     @Override

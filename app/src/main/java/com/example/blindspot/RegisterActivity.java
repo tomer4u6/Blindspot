@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,12 +24,14 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Locale;
+
 import static com.example.blindspot.FBref.refAuth;
 import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.12.1
+ * @version 0.13.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -40,6 +43,8 @@ public class RegisterActivity extends AppCompatActivity {
     EditText editText_name, editText_email, editText_pass;
     CheckBox checkBox_stayConnected;
 
+    TextToSpeech textToSpeech;
+
     String name, email, password, uid;
     User userdb;
 
@@ -50,7 +55,16 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        getSupportActionBar().setTitle("Register Activity");
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.US);
+                    textToSpeech.speak(getString(R.string.registerText), TextToSpeech.QUEUE_FLUSH, null);
+                }
+            }
+        });
+
 
 
         editText_name = (EditText)findViewById(R.id.editText_name);
@@ -196,6 +210,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
+
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     @Override
