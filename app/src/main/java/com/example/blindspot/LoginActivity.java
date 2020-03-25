@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -27,7 +29,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity
@@ -44,24 +46,58 @@ public class LoginActivity extends AppCompatActivity {
 
     String email, password;
 
+    Boolean isToSpeak;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.US);
-                    textToSpeech.speak(getString(R.string.loginText), TextToSpeech.QUEUE_FLUSH, null);
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
+
+        if (isToSpeak) {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        textToSpeech.setLanguage(Locale.US);
+                        textToSpeech.speak(getString(R.string.loginText), TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         editText_login_email = (EditText)findViewById(R.id.editText_login_email);
         editText_login_pass = (EditText)findViewById(R.id.editText_login_pass);
         checkBox_login_stayConnected = (CheckBox)findViewById(R.id.checkBox_login_stayConnected);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.getItem(0).setChecked(isToSpeak);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
+            }
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

@@ -44,8 +44,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Scanner"
+            android:text="Open Scanner"
             android:textSize="20dp"
+            android:background="@drawable/button_round"
             android:onClick="goToScanner"
             android:textAllCaps="false"
             />
@@ -60,10 +61,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="My Wardrobe"
+            android:text="Open My Wardrobe"
             android:onClick="goToWardrobe"
             android:textAllCaps="false"
             android:textSize="20dp"
+            android:background="@drawable/button_round"
             />
 
         <Space

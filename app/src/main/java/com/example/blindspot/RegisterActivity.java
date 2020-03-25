@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -23,6 +25,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Locale;
 
@@ -31,7 +34,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -44,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
     CheckBox checkBox_stayConnected;
 
     TextToSpeech textToSpeech;
+    Boolean isToSpeak;
 
     String name, email, password, uid;
     User userdb;
@@ -55,15 +59,20 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.US);
-                    textToSpeech.speak(getString(R.string.registerText), TextToSpeech.QUEUE_FLUSH, null);
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
+
+        if (isToSpeak) {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        textToSpeech.setLanguage(Locale.US);
+                        textToSpeech.speak(getString(R.string.registerText), TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
-            }
-        });
+            });
+        }
 
 
 
@@ -81,6 +90,32 @@ public class RegisterActivity extends AppCompatActivity {
         invalidChars[5] = '/';
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.getItem(0).setChecked(isToSpeak);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
+            }
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -119,10 +154,20 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseUser user = refAuth.getCurrentUser();
                             uid = user.getUid();
                             userdb = new User(name,email,uid);
-                            refUsers.child(email.replace("."," ")).setValue(userdb);
-                            Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                            startActivity(intent);
+                            refUsers.child(email.replace("."," ")).setValue(userdb)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                    }
+                                    else{
+                                        Toast.makeText(RegisterActivity.this, "Couldn't create user.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }
                         else{
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {

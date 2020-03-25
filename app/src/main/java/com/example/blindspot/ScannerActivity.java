@@ -7,12 +7,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +30,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -42,6 +45,8 @@ public class ScannerActivity extends AppCompatActivity {
 
     NfcAdapter nfcAdapter;
 
+    Boolean isToSpeak;
+
 
 
 
@@ -50,11 +55,39 @@ public class ScannerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
 
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
+
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
         textView_clothInfo.setText("Waiting for NDEF Message");
         fullInfo = null;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.getItem(0).setChecked(isToSpeak);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
+            }
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onResume() {

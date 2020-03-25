@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.Locale;
@@ -15,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -25,7 +27,10 @@ import java.util.Locale;
 public class WelcomeActivity extends AppCompatActivity {
 
     TextToSpeech textToSpeech;
+
     NfcAdapter nfcAdapter;
+
+    Boolean isToSpeak;
 
 
     @Override
@@ -33,16 +38,46 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
 
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.US);
-                    textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+        if (isToSpeak) {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        textToSpeech.setLanguage(Locale.US);
+                        textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
+            });
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.getItem(0).setChecked(isToSpeak);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
             }
-        });
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

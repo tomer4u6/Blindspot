@@ -28,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
     NfcAdapter nfcAdapter;
 
+    Boolean isToSpeak;
+
+
+
 
     /**
      * On activity create gets the user from Firebase and sets username on TextView
@@ -54,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView_username = (TextView)findViewById(R.id.textView_username);
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
 
 
         final ProgressDialog progressDialog = ProgressDialog.show(this,"Login",
@@ -67,15 +73,17 @@ public class MainActivity extends AppCompatActivity {
                        user.copyUser(dataSnapshot.getValue(User.class));
                         textView_username.setText("Welcome "+user.getName()+".");
                         progressDialog.dismiss();
-                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                            @Override
-                            public void onInit(int status) {
-                                if(status != TextToSpeech.ERROR){
-                                    textToSpeech.setLanguage(Locale.US);
-                                    textToSpeech.speak( "Welcome "+user.getName()+". " + getString(R.string.mainText) ,TextToSpeech.QUEUE_FLUSH, null);
+                        if (isToSpeak) {
+                            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                                @Override
+                                public void onInit(int status) {
+                                    if (status != TextToSpeech.ERROR) {
+                                        textToSpeech.setLanguage(Locale.US);
+                                        textToSpeech.speak("Welcome " + user.getName() + ". " + getString(R.string.mainText), TextToSpeech.QUEUE_FLUSH, null);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
 
                     @Override
@@ -83,12 +91,14 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-
+        textView_username = (TextView)findViewById(R.id.textView_username);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
         menu.add("Log Out");
+        menu.getItem(0).setChecked(isToSpeak);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -105,6 +115,21 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
             startActivity(intent);
             finish();
+        }
+
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
+            }
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

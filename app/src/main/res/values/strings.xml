@@ -2,6 +2,7 @@
     <string name="app_name">Blindspot</string>
     <string name="welcomeText">Welcome to Blindspot app.
         Select Register or Login below.
+        You can disable the voice introduction from the menu in each screen.
     </string>
 
     <string name="registerText">Please register to the app by entering Name, Email and Password."

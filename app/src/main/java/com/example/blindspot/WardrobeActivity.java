@@ -7,12 +7,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,6 +23,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +41,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.13.0
+ * @version 0.14.0
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -77,11 +82,16 @@ public class WardrobeActivity extends AppCompatActivity {
 
     NfcAdapter nfcAdapter;
 
+    Boolean isToSpeak;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wardrobe);
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
 
 
         listView_wardrobe = (ListView)findViewById(R.id.listView_wardrobe);
@@ -104,7 +114,6 @@ public class WardrobeActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 wardrobeList.clear();
                 for (DataSnapshot childSnapShot : dataSnapshot.getChildren()){
-                    String code = childSnapShot.getKey();
                     Cloth cloth = childSnapShot.getValue(Cloth.class);
                     String value = cloth.toString();
                     wardrobeList.add(value);
@@ -153,6 +162,32 @@ public class WardrobeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.getItem(0).setChecked(isToSpeak);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.textToSpeechCheckbox){
+            SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            if(item.isChecked()){
+                item.setChecked(false);
+                editor.putBoolean("speakText", false);
+                editor.commit();
+            }
+            else {
+                item.setChecked(true);
+                editor.putBoolean("speakText", true);
+                editor.commit();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -265,13 +300,24 @@ public class WardrobeActivity extends AppCompatActivity {
                                     if(dataSnapshot.hasChild(clothCode)){
                                         amount = dataSnapshot.child(clothCode).getValue(Cloth.class).getAmount();
                                         amount += 1;
-                                        refWardrobe_user.child(clothCode).child("amount").setValue(amount);
+                                        refWardrobe_user.child(clothCode).child("amount").setValue(amount)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Toast.makeText(WardrobeActivity.this, "Adding succeeded.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
                                     else {
                                         Cloth cloth = new Cloth(type,color,size,1L);
-                                        refWardrobe_user.child(clothCode).setValue(cloth);
+                                        refWardrobe_user.child(clothCode).setValue(cloth)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Toast.makeText(WardrobeActivity.this, "Adding succeeded.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
-                                    Toast.makeText(WardrobeActivity.this, "Adding succeeded.", Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
@@ -298,11 +344,23 @@ public class WardrobeActivity extends AppCompatActivity {
                                                 amount = dataSnapshot.getValue(Cloth.class).getAmount();
                                                 amount = amount - 1;
                                                 if (amount == 0) {
-                                                    refWardrobe_user.child(clothCode).removeValue();
-                                                } else {
-                                                    refWardrobe_user.child(clothCode).child("amount").setValue(amount);
+                                                    refWardrobe_user.child(clothCode).removeValue()
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Toast.makeText(WardrobeActivity.this, "Removing succeeded.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
                                                 }
-                                                Toast.makeText(WardrobeActivity.this, "Removing succeeded.", Toast.LENGTH_SHORT).show();
+                                                else {
+                                                    refWardrobe_user.child(clothCode).child("amount").setValue(amount)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Toast.makeText(WardrobeActivity.this, "Removing succeeded.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                }
                                             }
 
                                             @Override
