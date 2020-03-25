@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.14.0
+ * @version 0.15.0
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -61,12 +61,17 @@ public class WelcomeActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.textToSpeechCheckbox){
+        if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             if(item.isChecked()){
+                if(textToSpeech != null){
+                    textToSpeech.stop();
+                    textToSpeech.shutdown();
+                }
                 item.setChecked(false);
                 editor.putBoolean("speakText", false);
                 editor.commit();
@@ -116,6 +121,7 @@ public class WelcomeActivity extends AppCompatActivity {
         if(isConnected){
             Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -123,10 +129,12 @@ public class WelcomeActivity extends AppCompatActivity {
     public void moveToRegister(View view) {
         Intent intent = new Intent(WelcomeActivity.this, RegisterActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void moveToLogin(View view) {
         Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
         startActivity(intent);
+        finish();
     }
 }

@@ -30,7 +30,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.14.0
+ * @version 0.15.0
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -72,10 +72,14 @@ public class ScannerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.textToSpeechCheckbox){
+        if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             if(item.isChecked()){
+                if(textToSpeech != null){
+                    textToSpeech.stop();
+                    textToSpeech.shutdown();
+                }
                 item.setChecked(false);
                 editor.putBoolean("speakText", false);
                 editor.commit();
@@ -210,5 +214,14 @@ public class ScannerActivity extends AppCompatActivity {
             Intent shareIntent = Intent.createChooser(sendIntent, null);
             startActivity(shareIntent);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent intent = new Intent(ScannerActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

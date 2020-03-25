@@ -28,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.14.0
+ * @version 0.15.0
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -117,10 +117,14 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        if(item.getItemId() == R.id.textToSpeechCheckbox){
+        if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             if(item.isChecked()){
+                if(textToSpeech != null){
+                    textToSpeech.stop();
+                    textToSpeech.shutdown();
+                }
                 item.setChecked(false);
                 editor.putBoolean("speakText", false);
                 editor.commit();
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToScanner(View view) {
         Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -148,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToWardrobe(View view) {
         Intent intent = new Intent(MainActivity.this, WardrobeActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override

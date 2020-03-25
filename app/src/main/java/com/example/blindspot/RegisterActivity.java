@@ -34,7 +34,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.14.0
+ * @version 0.15.0
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -101,10 +101,14 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.textToSpeechCheckbox){
+        if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             if(item.isChecked()){
+                if(textToSpeech != null){
+                    textToSpeech.stop();
+                    textToSpeech.shutdown();
+                }
                 item.setChecked(false);
                 editor.putBoolean("speakText", false);
                 editor.commit();
@@ -162,6 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         Toast.makeText(RegisterActivity.this, "Registered successfully", Toast.LENGTH_LONG).show();
                                         Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                                         startActivity(intent);
+                                        finish();
                                     }
                                     else{
                                         Toast.makeText(RegisterActivity.this, "Couldn't create user.", Toast.LENGTH_SHORT).show();
@@ -260,6 +265,15 @@ public class RegisterActivity extends AppCompatActivity {
             textToSpeech.stop();
             textToSpeech.shutdown();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent intent = new Intent(RegisterActivity.this, WelcomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

@@ -41,7 +41,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.14.0
+ * @version 0.15.0
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -173,10 +173,14 @@ public class WardrobeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.textToSpeechCheckbox){
+        if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             if(item.isChecked()){
+                if(textToSpeech != null){
+                    textToSpeech.stop();
+                    textToSpeech.shutdown();
+                }
                 item.setChecked(false);
                 editor.putBoolean("speakText", false);
                 editor.commit();
@@ -401,5 +405,14 @@ public class WardrobeActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent intent = new Intent(WardrobeActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
