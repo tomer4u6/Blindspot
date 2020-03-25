@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.0
+ * @version 0.15.1
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -111,6 +111,10 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onNewIntent(intent);
     }
 
+    /**
+     * On activity start checks if the user selected to stay connected:
+     * Starts Main activity if true
+     */
 
     @Override
     protected void onStart() {

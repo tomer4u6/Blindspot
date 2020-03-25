@@ -30,7 +30,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.0
+ * @version 0.15.1
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -92,6 +92,13 @@ public class ScannerActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * On activity resume checks if NFC adapter is active:
+     * If false creating AlertDialog to open NFC settings,
+     * If true enabling adapter ForegroundDispatch
+     *
+     */
 
     @Override
     protected void onResume() {
@@ -201,6 +208,11 @@ public class ScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * When button is pressed, if cloth was scanned opens sharing options
+     *
+     * @param view Button
+     */
     public void shareInfo(View view) {
         if(fullInfo!=null){
 
@@ -213,6 +225,9 @@ public class ScannerActivity extends AppCompatActivity {
 
             Intent shareIntent = Intent.createChooser(sendIntent, null);
             startActivity(shareIntent);
+        }
+        else {
+            Toast.makeText(this, "Cloth wasn't scanned!", Toast.LENGTH_SHORT).show();
         }
     }
 

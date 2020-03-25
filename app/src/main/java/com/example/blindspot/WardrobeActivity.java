@@ -41,7 +41,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.0
+ * @version 0.15.1
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -208,6 +208,12 @@ public class WardrobeActivity extends AppCompatActivity {
         query.removeEventListener(valueEventListener);
     }
 
+    /**
+     * On activity resume checks if NFC adapter is active:
+     * If false creating AlertDialog to open NFC settings,
+     * If true enabling adapter ForegroundDispatch
+     *
+     */
 
     @Override
     protected void onResume() {
