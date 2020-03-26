@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.1
+ * @version 0.15.2
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -97,6 +97,7 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         nfcAdapter.disableForegroundDispatch(this);
 
@@ -113,7 +114,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     /**
      * On activity start checks if the user selected to stay connected:
-     * Starts Main activity if true
+     * If true starts Main activity
      */
 
     @Override
@@ -126,6 +127,10 @@ public class WelcomeActivity extends AppCompatActivity {
             Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
+            if(textToSpeech != null){
+                textToSpeech.stop();
+                textToSpeech.shutdown();
+            }
         }
     }
 

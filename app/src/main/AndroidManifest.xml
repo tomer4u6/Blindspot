@@ -12,8 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WardrobeActivity"></activity>
-        <activity android:name=".ScannerActivity">
+        <activity android:name=".WardrobeActivity"
+            android:label="Wardrobe activity"
+            >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
@@ -22,10 +23,28 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".WelcomeActivity">
+        <activity android:name=".ScannerActivity"
+            android:label="Scanner activity"
+            >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity"
+            android:label="Main activity"
+            />
+        <activity android:name=".LoginActivity"
+            android:label="Login activity"
+            />
+        <activity android:name=".RegisterActivity"
+            android:label="Register activity"
+            />
+        <activity android:name=".WelcomeActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
