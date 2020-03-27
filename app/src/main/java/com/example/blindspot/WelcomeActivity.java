@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -32,6 +32,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     Boolean isToSpeak;
 
+    Menu optionsMenu;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +42,20 @@ public class WelcomeActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
+        boolean isConnected = settings.getBoolean("stayConnected",false);
 
-        if (isToSpeak) {
-            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                @Override
-                public void onInit(int status) {
-                    if (status != TextToSpeech.ERROR) {
-                        textToSpeech.setLanguage(Locale.US);
-                        textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+        if (!isConnected) {
+            if (isToSpeak) {
+                textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if (status != TextToSpeech.ERROR) {
+                            textToSpeech.setLanguage(Locale.US);
+                            textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -88,6 +93,12 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
+        if (optionsMenu != null){
+            optionsMenu.getItem(0).setChecked(isToSpeak);
+        }
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
@@ -127,10 +138,7 @@ public class WelcomeActivity extends AppCompatActivity {
             Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
-            if(textToSpeech != null){
-                textToSpeech.stop();
-                textToSpeech.shutdown();
-            }
+
         }
     }
 
@@ -138,12 +146,10 @@ public class WelcomeActivity extends AppCompatActivity {
     public void moveToRegister(View view) {
         Intent intent = new Intent(WelcomeActivity.this, RegisterActivity.class);
         startActivity(intent);
-        finish();
     }
 
     public void moveToLogin(View view) {
         Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
         startActivity(intent);
-        finish();
     }
 }

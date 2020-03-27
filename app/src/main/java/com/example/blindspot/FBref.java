@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.3.0 (08/12/2019)
  *
  * Fbref class

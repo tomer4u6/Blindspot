@@ -28,7 +28,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.5.0 (20/12/2019)
  *
  * Main Activity
@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     NfcAdapter nfcAdapter;
 
     Boolean isToSpeak;
+
+    Menu optionsMenu;
 
 
 
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.add("Log Out");
+        optionsMenu = menu;
         menu.getItem(0).setChecked(isToSpeak);
 
         return super.onCreateOptionsMenu(menu);
@@ -141,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
     public void goToScanner(View view) {
         Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
         startActivity(intent);
-        finish();
     }
 
     @Override
@@ -153,12 +155,17 @@ public class MainActivity extends AppCompatActivity {
     public void goToWardrobe(View view) {
         Intent intent = new Intent(MainActivity.this, WardrobeActivity.class);
         startActivity(intent);
-        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
+        isToSpeak = settings.getBoolean("speakText",true);
+        if (optionsMenu != null){
+            optionsMenu.getItem(0).setChecked(isToSpeak);
+        }
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);

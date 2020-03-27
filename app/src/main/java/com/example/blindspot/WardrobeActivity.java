@@ -41,7 +41,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.9.0 (26/01/2020)
  *
  * Wardrobe Activity
@@ -241,8 +241,8 @@ public class WardrobeActivity extends AppCompatActivity {
             builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    finish();
                     dialog.cancel();
+                    finish();
                 }
             });
 
@@ -417,8 +417,6 @@ public class WardrobeActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent intent = new Intent(WardrobeActivity.this, MainActivity.class);
-        startActivity(intent);
         finish();
     }
 }

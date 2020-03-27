@@ -29,7 +29,7 @@ import static com.example.blindspot.FBref.refAuth;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.4.0 (15/12/2019)
  *
  * Login Activity
@@ -207,8 +207,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
-        startActivity(intent);
         finish();
     }
 

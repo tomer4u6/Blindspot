@@ -34,7 +34,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -271,8 +271,6 @@ public class RegisterActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent intent = new Intent(RegisterActivity.this, WelcomeActivity.class);
-        startActivity(intent);
         finish();
     }
 

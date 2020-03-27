@@ -30,7 +30,7 @@ import static com.example.blindspot.FBref.refClothes;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.2
+ * @version 0.15.3
  * @since 0.6.0 (09/01/2020)
  *
  * Scanner Activity
@@ -128,8 +128,8 @@ public class ScannerActivity extends AppCompatActivity {
             builder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    finish();
                     dialog.cancel();
+                    finish();
                 }
             });
 
@@ -235,8 +235,6 @@ public class ScannerActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent intent = new Intent(ScannerActivity.this, MainActivity.class);
-        startActivity(intent);
         finish();
     }
 }
