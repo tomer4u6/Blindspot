@@ -34,7 +34,7 @@ import static com.example.blindspot.FBref.refUsers;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.3
+ * @version 0.15.4
  * @since 0.3.0 (08/12/2019)
  *
  * Register Activity
@@ -250,8 +250,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onResume();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        if (nfcAdapter != null) {
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        }
     }
 
     @Override
@@ -259,7 +261,9 @@ public class RegisterActivity extends AppCompatActivity {
         super.onPause();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
 
         if(textToSpeech != null){
             textToSpeech.stop();

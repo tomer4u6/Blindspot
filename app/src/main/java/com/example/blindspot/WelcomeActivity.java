@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * @author Tomer Ben Ari
- * @version 0.15.3
+ * @version 0.15.4
  * @since 0.2.0 (05/12/2019)
  *
  * Welcome Activity
@@ -101,8 +101,10 @@ public class WelcomeActivity extends AppCompatActivity {
         }
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        if (nfcAdapter != null) {
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        }
     }
 
     @Override
@@ -110,7 +112,9 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onPause();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
 
         if(textToSpeech != null){
             textToSpeech.stop();
