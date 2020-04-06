@@ -36,7 +36,7 @@ import static com.example.blindspot.FBref.refClothes;
  * and share them with others.
  *
  * @author Tomer Ben Ari
- * @version 0.16.1
+ * @version 0.16.2
  * @since 0.6.0 (09/01/2020)
  */
 
@@ -50,6 +50,8 @@ public class ScannerActivity extends AppCompatActivity {
     NfcAdapter nfcAdapter;
 
     Boolean isToSpeak;
+
+    boolean speakAgain,firstOpen;
 
 
     /**
@@ -66,6 +68,9 @@ public class ScannerActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
+
+        speakAgain = true;
+        firstOpen = true;
 
 
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
@@ -134,7 +139,8 @@ public class ScannerActivity extends AppCompatActivity {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
 
-            if (isToSpeak) {
+            if (isToSpeak && speakAgain) {
+                speakAgain = false;
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -154,16 +160,16 @@ public class ScannerActivity extends AppCompatActivity {
             }
         }
         else {
-            Toast.makeText(this, getText(R.string.nfcDisabled), Toast.LENGTH_SHORT).show();
             AlertDialog.Builder builder;
             builder = new AlertDialog.Builder(this);
             builder.setTitle("Open NFC settings");
-            builder.setMessage("Press OPEN to open NFC settings:");
+            builder.setMessage(getString(R.string.nfcDisabled));
             builder.setCancelable(false);
 
             builder.setPositiveButton("OPEN", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    firstOpen = false;
                     startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
                     dialog.dismiss();
                 }
@@ -179,6 +185,24 @@ public class ScannerActivity extends AppCompatActivity {
 
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+
+            if (firstOpen) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                            @Override
+                            public void onInit(int status) {
+                                if (status != TextToSpeech.ERROR) {
+                                    textToSpeech.setLanguage(Locale.US);
+                                    textToSpeech.speak(getString(R.string.nfcDisabled), TextToSpeech.QUEUE_FLUSH, null);
+                                }
+                            }
+                        });
+                    }
+                }, 500);
+            }
         }
     }
 
@@ -215,15 +239,22 @@ public class ScannerActivity extends AppCompatActivity {
                                     + "Color:" + color
                     );
 
-                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
                         @Override
-                        public void onInit(int status) {
-                            if (status != TextToSpeech.ERROR) {
-                                textToSpeech.setLanguage(Locale.US);
-                                textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
-                            }
+                        public void run() {
+                            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                                @Override
+                                public void onInit(int status) {
+                                    if (status != TextToSpeech.ERROR) {
+                                        textToSpeech.setLanguage(Locale.US);
+                                        textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
+                                    }
+                                }
+                            });
                         }
-                    });
+                    }, 700);
+
                 }
 
                 @Override

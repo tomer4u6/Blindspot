@@ -34,7 +34,7 @@ import java.util.Locale;
  * where the user can move to the register screen or the login screen.
  *
  * @author Tomer Ben Ari
- * @version 0.16.1
+ * @version 0.16.2
  * @since 0.2.0 (05/12/2019)
  */
 

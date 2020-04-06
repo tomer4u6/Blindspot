@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -46,7 +48,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The wardrobe screen where the user can handle his wardrobe.
  *
  * @author Tomer Ben Ari
- * @version 0.16.1
+ * @version 0.16.2
  * @since 0.9.0 (26/01/2020)
  */
 
@@ -87,6 +89,8 @@ public class WardrobeActivity extends AppCompatActivity {
 
     Boolean isToSpeak;
 
+    boolean speakAgain,firstOpen;
+
 
     /**
      * On activity create:
@@ -104,6 +108,9 @@ public class WardrobeActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
+
+        speakAgain = true;
+        firstOpen = true;
 
 
         listView_wardrobe = (ListView)findViewById(R.id.listView_wardrobe);
@@ -271,7 +278,8 @@ public class WardrobeActivity extends AppCompatActivity {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
 
-            if (isToSpeak) {
+            if (isToSpeak && speakAgain) {
+                speakAgain = false;
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -291,15 +299,15 @@ public class WardrobeActivity extends AppCompatActivity {
             }
         }
         else {
-            Toast.makeText(this, getText(R.string.nfcDisabled), Toast.LENGTH_SHORT).show();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Open NFC settings");
-            builder.setMessage("Press OPEN to open NFC settings:");
+            builder.setMessage(getString(R.string.nfcDisabled));
             builder.setCancelable(false);
 
             builder.setPositiveButton("OPEN", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    firstOpen = false;
                     startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
                 }
             });
@@ -314,6 +322,24 @@ public class WardrobeActivity extends AppCompatActivity {
 
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+
+            if (firstOpen) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                            @Override
+                            public void onInit(int status) {
+                                if (status != TextToSpeech.ERROR) {
+                                    textToSpeech.setLanguage(Locale.US);
+                                    textToSpeech.speak(getString(R.string.nfcDisabled), TextToSpeech.QUEUE_FLUSH, null);
+                                }
+                            }
+                        });
+                    }
+                }, 700);
+            }
         }
     }
 
@@ -350,26 +376,23 @@ public class WardrobeActivity extends AppCompatActivity {
                     fullInfo = size + " " + color + " " + type;
 
 
-                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                        @Override
-                        public void onInit(int status) {
-                            if (status != TextToSpeech.ERROR) {
-                                textToSpeech.setLanguage(Locale.US);
-                                textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
-                            }
-                        }
-                    });
-
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(WardrobeActivity.this);
                     builder.setTitle("Adding/Removing clothing item");
                     builder.setMessage(fullInfo +
-                            "\n\nSelect Add to add this item to your wardrobe or Remove to remove it from your wardrobe if it contains this item");
+                            "\n\n"+getString(R.string.addOrRemove));
                     builder.setCancelable(false);
 
                     builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            int index = 0;
+                            for (int i = 1; i < types.length; i++){
+                                if (types[i].equals(type)){
+                                    index = i;
+                                    break;
+                                }
+                            }
+                            spinner_type.setSelection(index);
                             spinner_type.setSelection(10);
                             refWardrobe_user.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
