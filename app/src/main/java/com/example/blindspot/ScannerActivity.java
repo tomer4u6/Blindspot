@@ -29,11 +29,14 @@ import java.util.Locale;
 import static com.example.blindspot.FBref.refClothes;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.6.0 (09/01/2020)
+ * <h1>Scanner Activity</h1>
  *
- * Scanner Activity
+ * The Scanner screen where the user can scan clothes
+ * and share them with others.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.6.0 (09/01/2020)
  */
 
 public class ScannerActivity extends AppCompatActivity {
@@ -48,7 +51,13 @@ public class ScannerActivity extends AppCompatActivity {
     Boolean isToSpeak;
 
 
-
+    /**
+     * On activity create:
+     * <br>If the user enabled voice introduction: speaks the activity text;
+     * <br>Connects widgets to their view in xml.
+     *
+     * @param savedInstanceState Containing the activity's previously saved state.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +67,30 @@ public class ScannerActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
 
+        if (isToSpeak) {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        textToSpeech.setLanguage(Locale.US);
+                        textToSpeech.speak(getString(R.string.scannerText),
+                                TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                }
+            });
+        }
+
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
         textView_clothInfo.setText("Waiting for NDEF Message");
         fullInfo = null;
     }
+
+    /**
+     * Creates the menu of the activity.
+     *
+     * @param menu The options menu in which you place your items.
+     * @return You must return true for the menu to be displayed, if you return false it will not be shown.
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,6 +98,13 @@ public class ScannerActivity extends AppCompatActivity {
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handling item selection from the menu.
+     *
+     * @param item The menu item that was selected.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -94,10 +130,10 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     /**
-     * On activity resume checks if NFC adapter is active:
-     * If false creating AlertDialog to open NFC settings,
-     * If true enabling adapter ForegroundDispatch
-     *
+     * On activity resume:
+     * <br>Checks if NFC and Android Beam is enabled in the phone:
+     * if false creating dialog to open NFC settings,
+     * if true adds the NFC adapter to the Foreground Dispatch system.
      */
 
     @Override
@@ -141,12 +177,13 @@ public class ScannerActivity extends AppCompatActivity {
 
     /**
      * Gets the clothing item code from another device via Android Beam,
-     * retrieves the information from Firebase according to code,
-     * displays the information in TextView,
-     * reads the information out loud
+     * <br>retrieves the information from Firebase according to code,
+     * <br>displays the information in TextView and speaks the information.
      *
-     * @param intent
+     * @param intent The new intent that was started for the activity
+     *               (Intent to start an activity when a tag with NDEF payload is discovered).
      */
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -195,12 +232,20 @@ public class ScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * On activity pause:
+     * <br>Removes NFC adapter from Foreground Dispatch system if is not null;
+     * <br>Stops and shuts down TextToSpeech object if is not null.
+     */
+
     @Override
     protected void onPause() {
         super.onPause();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
 
         if(textToSpeech != null){
             textToSpeech.stop();
@@ -209,9 +254,10 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     /**
-     * When button is pressed, if cloth was scanned opens sharing options
+     * When button is pressed:
+     * <br>If cloth was scanned: opens sharing options.
      *
-     * @param view Button
+     * @param view Click to share button.
      */
     public void shareInfo(View view) {
         if(fullInfo!=null){
@@ -230,6 +276,10 @@ public class ScannerActivity extends AppCompatActivity {
             Toast.makeText(this, "Cloth wasn't scanned!", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /**
+     * When back button is pressed: finishes the activity.
+     */
 
     @Override
     public void onBackPressed() {

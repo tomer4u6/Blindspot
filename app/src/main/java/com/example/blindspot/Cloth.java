@@ -3,14 +3,13 @@ package com.example.blindspot;
 import androidx.annotation.NonNull;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.12.0 (05/03/2020)
+ * <h1>Cloth Class</h1>
  *
- * Cloth class
- * <p>
- *     Contains cloth info
- * </p>
+ * Contains cloth information.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.12.0 (05/03/2020)
  */
 
 public class Cloth {
@@ -19,12 +18,25 @@ public class Cloth {
     private String size;
     private Long amount;
 
+    /**
+     * Creates Cloth object with empty fields.
+     */
+
     public Cloth(){
         this.type = "";
         this.color = "";
         this.size = "";
         this.amount = 0L;
     }
+
+    /**
+     * Creates Cloth object with the given type, color, size and amount.
+     *
+     * @param type Type of the cloth.
+     * @param color Color of the cloth.
+     * @param size Size of the cloth.
+     * @param amount Amount of the cloth.
+     */
 
     public Cloth(String type, String color, String size, Long amount){
         this.type = type;
@@ -65,6 +77,11 @@ public class Cloth {
         return amount;
     }
 
+    /**
+     * Converts cloth information into one string.
+     *
+     * @return Returns cloth information.
+     */
     @NonNull
     @Override
     public String toString() {

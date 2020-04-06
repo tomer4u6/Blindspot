@@ -40,11 +40,13 @@ import static com.example.blindspot.FBref.refWardrobe;
 import static com.example.blindspot.FBref.refAuth;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.9.0 (26/01/2020)
+ * <h1>Wardrobe Activity</h1>
  *
- * Wardrobe Activity
+ * The wardrobe screen where the user can handle his wardrobe.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.9.0 (26/01/2020)
  */
 
 public class WardrobeActivity extends AppCompatActivity {
@@ -85,6 +87,16 @@ public class WardrobeActivity extends AppCompatActivity {
     Boolean isToSpeak;
 
 
+    /**
+     * On activity create:
+     * <br>If the user enabled voice introduction: speaks the activity text;
+     * <br>Connects widgets to their view in xml;
+     * <br>Displays the user's wardrobe in the ListView.
+     *
+     *
+     * @param savedInstanceState Containing the activity's previously saved state.
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +104,19 @@ public class WardrobeActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
+
+        if (isToSpeak) {
+            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status != TextToSpeech.ERROR) {
+                        textToSpeech.setLanguage(Locale.US);
+                        textToSpeech.speak(getString(R.string.wardrobeText),
+                                TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                }
+            });
+        }
 
 
         listView_wardrobe = (ListView)findViewById(R.id.listView_wardrobe);
@@ -135,13 +160,14 @@ public class WardrobeActivity extends AppCompatActivity {
         spinner_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             /**
-             * When item is selected from Spinner: changes the view in ListView,
-             * sorted by the selected type from Spinner using Query
+             * When item is selected from Spinner:
+             * <br>Changes the view in ListView,
+             * sorted by the selected type from Spinner using Query.
              *
-             * @param parent
-             * @param view
-             * @param position
-             * @param id
+             * @param parent The AdapterView where the selection happened.
+             * @param view The view within the AdapterView that was clicked.
+             * @param position The position of the view in the adapter.
+             * @param id The row id of the item that is selected.
              */
 
             @Override
@@ -164,12 +190,27 @@ public class WardrobeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates the menu of the activity.
+     *
+     * @param menu The options menu in which you place your items.
+     * @return You must return true for the menu to be displayed,
+     * if you return false it will not be shown.
+     */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handling item selection from the menu.
+     *
+     * @param item The menu item that was selected.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -194,25 +235,43 @@ public class WardrobeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * On activity pause:
+     * <br>Removes NFC adapter from Foreground Dispatch system if is not null;
+     * <br>Stops and shuts down TextToSpeech object if is not null.
+     */
+
     @Override
     protected void onPause() {
         super.onPause();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        nfcAdapter.disableForegroundDispatch(this);
-    }
+        if (nfcAdapter != null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        query.removeEventListener(valueEventListener);
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     /**
-     * On activity resume checks if NFC adapter is active:
-     * If false creating AlertDialog to open NFC settings,
-     * If true enabling adapter ForegroundDispatch
-     *
+     * On activity stop: removes ValueEventListener from the Query.
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (query != null) {
+            query.removeEventListener(valueEventListener);
+        }
+    }
+
+    /**
+     * On activity resume:
+     * <br>Checks if NFC and Android Beam is enabled in the phone:
+     * if false creating dialog to open NFC settings,
+     * if true adds the NFC adapter to the Foreground Dispatch system if is not null.
      */
 
     @Override
@@ -253,14 +312,15 @@ public class WardrobeActivity extends AppCompatActivity {
 
 
     /**
-     * Adding/Removing clothing item to/from wardrobe on Firebase
+     * Adding/Removing clothing item to/from wardrobe on Firebase using Android Beam.
      * <p>
      *     Gets the clothing item code from another device via Android Beam,
-     *     retrieves the information from Firebase according to code,
-     *     opens AlertDialog for adding or removing the item
+     *     <br>retrieves the information from Firebase according to the code,
+     *     <br>opens dialog for adding or removing the item.
      * </p>
      *
-     * @param intent
+     * @param intent The new intent that was started for the activity
+     *               (Intent to start an activity when a tag with NDEF payload is discovered).
      */
 
     @Override
@@ -412,6 +472,10 @@ public class WardrobeActivity extends AppCompatActivity {
             });
         }
     }
+
+    /**
+     * When back button is pressed: finishes the activity.
+     */
 
     @Override
     public void onBackPressed() {

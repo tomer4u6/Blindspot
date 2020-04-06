@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.blindspot">
 
-    <uses-permission android:name="android.permission.NFC"/>
-    <uses-feature android:name="android.hardware.nfc" android:required="true"/>
+    <uses-permission android:name="android.permission.NFC" />
+
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -12,9 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WardrobeActivity"
-            android:label="Wardrobe activity"
-            >
+        <activity
+            android:name=".WardrobeActivity"
+            android:label="My Wardrobe">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
@@ -23,9 +26,9 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".ScannerActivity"
-            android:label="Scanner activity"
-            >
+        <activity
+            android:name=".ScannerActivity"
+            android:label="Scanner">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
 
@@ -34,17 +37,16 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
-            android:label="Main activity"
-            />
-        <activity android:name=".LoginActivity"
-            android:label="Login activity"
-            />
-        <activity android:name=".RegisterActivity"
-            android:label="Register activity"
-            />
-        <activity android:name=".WelcomeActivity"
-            >
+        <activity
+            android:name=".MainActivity"
+            android:label="Main activity" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="Login screen" />
+        <activity
+            android:name=".RegisterActivity"
+            android:label="Registration screen" />
+        <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

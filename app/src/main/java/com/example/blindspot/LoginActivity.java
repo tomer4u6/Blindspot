@@ -28,11 +28,13 @@ import java.util.Locale;
 import static com.example.blindspot.FBref.refAuth;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.4.0 (15/12/2019)
+ * <h1>Login Activity</h1>
  *
- * Login Activity
+ * The login screen where the user can login to the application.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.4.0 (15/12/2019)
  */
 
 public class LoginActivity extends AppCompatActivity {
@@ -47,6 +49,14 @@ public class LoginActivity extends AppCompatActivity {
     String email, password;
 
     Boolean isToSpeak;
+
+    /**
+     * On activity create:
+     * <br>If the user enabled voice introduction: speaks the activity text;
+     * <br>Connects widgets to their view in xml.
+     *
+     * @param savedInstanceState Containing the activity's previously saved state.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +84,26 @@ public class LoginActivity extends AppCompatActivity {
         checkBox_login_stayConnected = (CheckBox)findViewById(R.id.checkBox_login_stayConnected);
     }
 
+    /**
+     * Creates the menu of the activity.
+     *
+     * @param menu The options menu in which you place your items.
+     * @return You must return true for the menu to be displayed, if you return false it will not be shown.
+     */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handling item selection from the menu.
+     *
+     * @param item The menu item that was selected.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -105,10 +129,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Login to Firebase with email and password
+     * Login to Firebase with email and password.
+     * <p>
+     *     Calls {@link #validateForm()} to check if the user filled out all the fields.
+     * </p>
      *
-     * @param email User email
-     * @param password User password
+     * @param email User's email.
+     * @param password User's password.
      */
 
     public void loginToAccount(String email, String password){
@@ -147,9 +174,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Checks if the user input is not missing
+     * Checks if the user's input is not missing.
      *
-     * @return boolean This returns false if input is missing and returns true if noting is missing
+     * @return Returns false if input is missing, true if noting is missing.
      */
     private boolean validateForm() {
         boolean valid = true;
@@ -174,12 +201,25 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
+    /**
+     * When the button is pressed:
+     * <br>Calls {@link #loginToAccount(String, String)} method
+     * using the email and password from the EditText.
+     *
+     * @param view Login button.
+     */
+
     public void login(View view) {
         email = editText_login_email.getText().toString();
         password = editText_login_pass.getText().toString();
 
         loginToAccount(email,password);
     }
+
+    /**
+     * On activity resume
+     * <br>Adds the NFC adapter to the Foreground Dispatch system if is not null.
+     */
 
     @Override
     protected void onResume() {
@@ -191,6 +231,12 @@ public class LoginActivity extends AppCompatActivity {
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         }
     }
+
+    /**
+     * On activity pause:
+     * <br>Removes NFC adapter from Foreground Dispatch system if is not null;
+     * <br>Stops and shuts down TextToSpeech object if is not null.
+     */
 
     @Override
     protected void onPause() {
@@ -206,6 +252,10 @@ public class LoginActivity extends AppCompatActivity {
             textToSpeech.shutdown();
         }
     }
+
+    /**
+     * When back button is pressed: finishes the activity.
+     */
 
     @Override
     public void onBackPressed() {

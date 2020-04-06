@@ -5,14 +5,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.3.0 (08/12/2019)
+ * <h1>FBref class</h1>
  *
- * Fbref class
- * <p>
- *     Contains Firebase references
- * </p>
+ * Contains Firebase references.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.3.0 (08/12/2019)
  */
 
 public class FBref {

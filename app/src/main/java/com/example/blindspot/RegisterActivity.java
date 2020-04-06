@@ -25,7 +25,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Locale;
 
@@ -33,11 +32,13 @@ import static com.example.blindspot.FBref.refAuth;
 import static com.example.blindspot.FBref.refUsers;
 
 /**
- * @author Tomer Ben Ari
- * @version 0.15.4
- * @since 0.3.0 (08/12/2019)
+ * <h1>Register Activity</h1>
  *
- * Register Activity
+ * The register screen where the user can register to the application.
+ *
+ * @author Tomer Ben Ari
+ * @version 0.16.0
+ * @since 0.3.0 (08/12/2019)
  */
 
 public class RegisterActivity extends AppCompatActivity {
@@ -53,6 +54,14 @@ public class RegisterActivity extends AppCompatActivity {
     User userdb;
 
     char[] invalidChars = new char[6];
+
+    /**
+     * On activity create:
+     * <br>If the user enabled voice introduction: speaks the activity text;
+     * <br>Connects widgets to their view in xml.
+     *
+     * @param savedInstanceState Containing the activity's previously saved state.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +101,26 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Creates the menu of the activity.
+     *
+     * @param menu The options menu in which you place your items.
+     * @return You must return true for the menu to be displayed, if you return false it will not be shown.
+     */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /**
+     * Handling item selection from the menu.
+     *
+     * @param item The menu item that was selected.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -123,15 +146,19 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * Creating a new user in Firebase
+     * Creating a new user in Firebase.
      * <p>
-     *     Registering a new user to Firebase using Firebase Auth with Email and Password
-     *     Adding the new User object to Firebase Realtime Database
+     *     Registering a new user to Firebase using Firebase Auth with email and password,
+     *     adding the new User object to Firebase Realtime Database.
      * </p>
      *
-     * @param name User name
-     * @param email User email
-     * @param password User password
+     * <p>
+     *     Calls {@link #validateForm()} to check if user input is not missing and is valid.
+     * </p>
+     *
+     * @param name User's name.
+     * @param email User's email.
+     * @param password User's password.
      */
 
     public void createAccount(final String name, final String email, String password) {
@@ -191,10 +218,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * Checks if the user input is not missing and valid
+     * Checks if the user input is not missing and is valid.
      *
-     * @return boolean This returns false if input is missing and returns true if noting is missing
+     * @return Returns false if input is missing or invalid, true if input is valid and not missing.
      */
+
     private boolean validateForm() {
         boolean valid = true;
 
@@ -237,6 +265,14 @@ public class RegisterActivity extends AppCompatActivity {
         return valid;
     }
 
+    /**
+     * When the button is pressed:
+     * <br>Calls {@link #createAccount(String, String, String)} method
+     * using the email, password and name from the EditText.
+     *
+     * @param view Register button.
+     */
+
     public void register(View view) {
         name = editText_name.getText().toString();
         email = editText_email.getText().toString();
@@ -244,6 +280,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         createAccount(name,email,password);
     }
+
+    /**
+     * On activity resume:
+     * <br>Adds the NFC adapter to the Foreground Dispatch system if is not null.
+     */
 
     @Override
     protected void onResume() {
@@ -255,6 +296,12 @@ public class RegisterActivity extends AppCompatActivity {
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         }
     }
+
+    /**
+     * On activity pause:
+     * <br>Removes NFC adapter from Foreground Dispatch system if is not null;
+     * <br>Stops and shuts down TextToSpeech object if is not null.
+     */
 
     @Override
     protected void onPause() {
@@ -270,6 +317,10 @@ public class RegisterActivity extends AppCompatActivity {
             textToSpeech.shutdown();
         }
     }
+
+    /**
+     * When back button is pressed: finishes the activity.
+     */
 
     @Override
     public void onBackPressed() {
