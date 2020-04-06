@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -45,7 +46,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The wardrobe screen where the user can handle his wardrobe.
  *
  * @author Tomer Ben Ari
- * @version 0.16.0
+ * @version 0.16.1
  * @since 0.9.0 (26/01/2020)
  */
 
@@ -89,7 +90,6 @@ public class WardrobeActivity extends AppCompatActivity {
 
     /**
      * On activity create:
-     * <br>If the user enabled voice introduction: speaks the activity text;
      * <br>Connects widgets to their view in xml;
      * <br>Displays the user's wardrobe in the ListView.
      *
@@ -104,19 +104,6 @@ public class WardrobeActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
         isToSpeak = settings.getBoolean("speakText",true);
-
-        if (isToSpeak) {
-            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                @Override
-                public void onInit(int status) {
-                    if (status != TextToSpeech.ERROR) {
-                        textToSpeech.setLanguage(Locale.US);
-                        textToSpeech.speak(getString(R.string.wardrobeText),
-                                TextToSpeech.QUEUE_FLUSH, null);
-                    }
-                }
-            });
-        }
 
 
         listView_wardrobe = (ListView)findViewById(R.id.listView_wardrobe);
@@ -271,7 +258,8 @@ public class WardrobeActivity extends AppCompatActivity {
      * On activity resume:
      * <br>Checks if NFC and Android Beam is enabled in the phone:
      * if false creating dialog to open NFC settings,
-     * if true adds the NFC adapter to the Foreground Dispatch system if is not null.
+     * if true adds the NFC adapter to the Foreground Dispatch system if is not null and
+     * if the user enabled voice introduction: speaks the activity text.
      */
 
     @Override
@@ -282,9 +270,28 @@ public class WardrobeActivity extends AppCompatActivity {
         if (nfcAdapter != null && nfcAdapter.isEnabled() && nfcAdapter.isNdefPushEnabled()){
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+
+            if (isToSpeak) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                            @Override
+                            public void onInit(int status) {
+                                if (status != TextToSpeech.ERROR) {
+                                    textToSpeech.setLanguage(Locale.US);
+                                    textToSpeech.speak(getString(R.string.wardrobeText),
+                                            TextToSpeech.QUEUE_FLUSH, null);
+                                }
+                            }
+                        });
+                    }
+                }, 3500);
+            }
         }
         else {
-            Toast.makeText(this, "NFC or Android Beam is not active :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getText(R.string.nfcDisabled), Toast.LENGTH_SHORT).show();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Open NFC settings");
             builder.setMessage("Press OPEN to open NFC settings:");

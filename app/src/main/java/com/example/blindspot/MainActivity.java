@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +35,7 @@ import static com.example.blindspot.FBref.refUsers;
  * or the Wardrobe screen.
  *
  * @author Tomer Ben Ari
- * @version 0.16.0
+ * @version 0.16.1
  * @since 0.5.0 (20/12/2019)
  */
 
@@ -82,18 +83,24 @@ public class MainActivity extends AppCompatActivity {
                         textView_username.setText("Welcome "+user.getName()+".");
                         progressDialog.dismiss();
                         if (isToSpeak) {
-                            textToSpeech = new TextToSpeech(getApplicationContext(),
-                                    new TextToSpeech.OnInitListener() {
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
                                 @Override
-                                public void onInit(int status) {
-                                    if (status != TextToSpeech.ERROR) {
-                                        textToSpeech.setLanguage(Locale.US);
-                                        textToSpeech.speak("Welcome " + user.getName() +
-                                                ". " + getString(R.string.mainText),
-                                                TextToSpeech.QUEUE_FLUSH, null);
-                                    }
+                                public void run() {
+                                    textToSpeech = new TextToSpeech(getApplicationContext(),
+                                            new TextToSpeech.OnInitListener() {
+                                                @Override
+                                                public void onInit(int status) {
+                                                    if (status != TextToSpeech.ERROR) {
+                                                        textToSpeech.setLanguage(Locale.US);
+                                                        textToSpeech.speak("Welcome " + user.getName() +
+                                                                        ". " + getString(R.string.mainText),
+                                                                TextToSpeech.QUEUE_FLUSH, null);
+                                                    }
+                                                }
+                                            });
                                 }
-                            });
+                            }, 1500);
                         }
                     }
 

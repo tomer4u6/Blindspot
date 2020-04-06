@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -33,7 +34,7 @@ import java.util.Locale;
  * where the user can move to the register screen or the login screen.
  *
  * @author Tomer Ben Ari
- * @version 0.16.0
+ * @version 0.16.1
  * @since 0.2.0 (05/12/2019)
  */
 
@@ -69,15 +70,21 @@ public class WelcomeActivity extends AppCompatActivity {
 
         if (!isConnected) {
             if (isToSpeak) {
-                textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
                     @Override
-                    public void onInit(int status) {
-                        if (status != TextToSpeech.ERROR) {
-                            textToSpeech.setLanguage(Locale.US);
-                            textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
-                        }
+                    public void run() {
+                        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                            @Override
+                            public void onInit(int status) {
+                                if (status != TextToSpeech.ERROR) {
+                                    textToSpeech.setLanguage(Locale.US);
+                                    textToSpeech.speak(getString(R.string.welcomeText), TextToSpeech.QUEUE_FLUSH, null);
+                                }
+                            }
+                        });
                     }
-                });
+                }, 1500);
             }
         }
 

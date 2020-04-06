@@ -24,8 +24,11 @@
 
     <string name="wardrobeText">You can handle your wardrobe from this screen.
         Attach the NFC tag of the cloth to add it to the wardrobe or to remove it from the wardrobe.
-        You can filter the clothes by selecting a type from the spinner below.
+        You can filter the clothes by selecting a type from the dropdown list below.
     </string>
+
+    <string name="nfcDisabled">NFC or Android Beam is not active.
+        Select OPEN in the dialog to open NFC settings.</string>
 
     <string name="emailAddress">tomer4u6@gmail.com</string>
     <string name="author">Author: Tomer Ben Ari</string>

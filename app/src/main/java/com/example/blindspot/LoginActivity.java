@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,7 +34,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The login screen where the user can login to the application.
  *
  * @author Tomer Ben Ari
- * @version 0.16.0
+ * @version 0.16.1
  * @since 0.4.0 (15/12/2019)
  */
 
@@ -68,15 +69,22 @@ public class LoginActivity extends AppCompatActivity {
         isToSpeak = settings.getBoolean("speakText",true);
 
         if (isToSpeak) {
-            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
                 @Override
-                public void onInit(int status) {
-                    if (status != TextToSpeech.ERROR) {
-                        textToSpeech.setLanguage(Locale.US);
-                        textToSpeech.speak(getString(R.string.loginText), TextToSpeech.QUEUE_FLUSH, null);
-                    }
+                public void run() {
+                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                        @Override
+                        public void onInit(int status) {
+                            if (status != TextToSpeech.ERROR) {
+                                textToSpeech.setLanguage(Locale.US);
+                                textToSpeech.speak(getString(R.string.loginText), TextToSpeech.QUEUE_FLUSH, null);
+                            }
+                        }
+                    });
                 }
-            });
+            }, 1500);
+
         }
 
         editText_login_email = (EditText)findViewById(R.id.editText_login_email);
