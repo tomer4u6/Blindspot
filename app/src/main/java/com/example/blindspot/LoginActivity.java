@@ -34,7 +34,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The login screen where the user can login to the application.
  *
  * @author Tomer Ben Ari
- * @version 0.16.2
+ * @version 1.0.0
  * @since 0.4.0 (15/12/2019)
  */
 

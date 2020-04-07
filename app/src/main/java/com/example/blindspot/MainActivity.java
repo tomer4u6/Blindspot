@@ -35,7 +35,7 @@ import static com.example.blindspot.FBref.refUsers;
  * or the Wardrobe screen.
  *
  * @author Tomer Ben Ari
- * @version 0.16.1
+ * @version 1.0.0
  * @since 0.5.0 (20/12/2019)
  */
 

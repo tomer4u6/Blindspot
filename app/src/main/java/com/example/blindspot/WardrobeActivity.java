@@ -48,7 +48,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The wardrobe screen where the user can handle his wardrobe.
  *
  * @author Tomer Ben Ari
- * @version 0.16.2
+ * @version 1.0.0
  * @since 0.9.0 (26/01/2020)
  */
 
