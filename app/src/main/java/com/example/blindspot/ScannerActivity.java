@@ -21,13 +21,17 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Locale;
 
+import static com.example.blindspot.FBref.refAuth;
 import static com.example.blindspot.FBref.refClothes;
+import static com.example.blindspot.FBref.refWardrobe;
 
 /**
  * <h1>Scanner Activity</h1>
@@ -36,7 +40,7 @@ import static com.example.blindspot.FBref.refClothes;
  * and share them with others.
  *
  * @author Tomer Ben Ari
- * @version 1.0.0
+ * @version 1.1.0
  * @since 0.6.0 (09/01/2020)
  */
 
@@ -44,6 +48,9 @@ public class ScannerActivity extends AppCompatActivity {
     TextView textView_clothInfo;
     String clothCode;
     String type,size,color,fullInfo,linkString;
+    Long amount;
+
+    DatabaseReference refWardrobe_user;
 
     TextToSpeech textToSpeech;
 
@@ -72,6 +79,8 @@ public class ScannerActivity extends AppCompatActivity {
         speakAgain = true;
         firstOpen = true;
 
+        FirebaseUser firebaseUser = refAuth.getCurrentUser();
+        refWardrobe_user = refWardrobe.child(firebaseUser.getEmail().replace("."," "));
 
         textView_clothInfo = (TextView) findViewById(R.id.textView_clothInfo);
         textView_clothInfo.setText("Waiting for NDEF Message");
@@ -233,28 +242,49 @@ public class ScannerActivity extends AppCompatActivity {
                     color = dataSnapshot.child("Color").getValue(String.class);
                     linkString = dataSnapshot.child("Uri").getValue(String.class);
                     fullInfo = size + " " + color + " " + type;
-                    textView_clothInfo.setText(
-                            "Type: " + type + "\n"
-                                    + "Size: " + size + "\n"
-                                    + "Color:" + color
-                    );
 
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
+                    refWardrobe_user.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void run() {
-                            textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                                @Override
-                                public void onInit(int status) {
-                                    if (status != TextToSpeech.ERROR) {
-                                        textToSpeech.setLanguage(Locale.US);
-                                        textToSpeech.speak(fullInfo, TextToSpeech.QUEUE_FLUSH, null);
-                                    }
-                                }
-                            });
-                        }
-                    }, 700);
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(clothCode)){
+                                amount = dataSnapshot.child(clothCode)
+                                        .child("amount").getValue(Long.class);
+                            }
+                            else {
+                                amount = 0L;
+                            }
 
+                            textView_clothInfo.setText(
+                                    "Type: " + type + "\n"
+                                            + "Size: " + size + "\n"
+                                            + "Color:" + color + "\n"
+                                            + "You have " + amount.toString() + " of these in your wardrobe."
+                            );
+
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                                        @Override
+                                        public void onInit(int status) {
+                                            if (status != TextToSpeech.ERROR) {
+                                                textToSpeech.setLanguage(Locale.US);
+                                                textToSpeech.speak(fullInfo + ". "
+                                                        + "You have " + amount.toString()
+                                                        + " of these in your wardrobe.", TextToSpeech.QUEUE_FLUSH, null);
+                                            }
+                                        }
+                                    });
+                                }
+                            }, 700);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
                 @Override

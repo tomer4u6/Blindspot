@@ -38,7 +38,7 @@ import static com.example.blindspot.FBref.refUsers;
  * The register screen where the user can register to the application.
  *
  * @author Tomer Ben Ari
- * @version 1.0.0
+ * @version 1.1.0
  * @since 0.3.0 (08/12/2019)
  */
 
