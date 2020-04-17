@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
  * Contains cloth information.
  *
  * @author Tomer Ben Ari
- * @version 1.1.0
+ * @version 1.1.1
  * @since 0.12.0 (05/03/2020)
  */
 

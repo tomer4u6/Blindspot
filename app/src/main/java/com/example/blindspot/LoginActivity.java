@@ -22,7 +22,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 
 import java.util.Locale;
 
@@ -34,7 +36,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The login screen where the user can login to the application.
  *
  * @author Tomer Ben Ari
- * @version 1.1.0
+ * @version 1.1.1
  * @since 0.4.0 (15/12/2019)
  */
 
@@ -172,9 +174,16 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-                else{
+                else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException){
                     Log.d("LoginActivity", "signInUserWithEmail:fail");
                     Toast.makeText(LoginActivity.this, "Email or Password are wrong!", Toast.LENGTH_SHORT).show();
+                }
+                else if (task.getException() instanceof FirebaseNetworkException){
+                    Toast.makeText(LoginActivity.this, "Network error.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Log.d("LoginActivity", "signInUserWithEmail:fail");
+                    Toast.makeText(LoginActivity.this, "User login failed.", Toast.LENGTH_SHORT).show();
                 }
 
             }

@@ -22,7 +22,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +40,7 @@ import static com.example.blindspot.FBref.refUsers;
  * The register screen where the user can register to the application.
  *
  * @author Tomer Ben Ari
- * @version 1.1.0
+ * @version 1.1.1
  * @since 0.3.0 (08/12/2019)
  */
 
@@ -214,6 +216,12 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                             else if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
                                 Toast.makeText(RegisterActivity.this, "Password is too weak!", Toast.LENGTH_SHORT).show();
+                            }
+                            else if (task.getException() instanceof FirebaseNetworkException){
+                                Toast.makeText(RegisterActivity.this, "Network error.", Toast.LENGTH_SHORT).show();
+                            }
+                            else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException){
+                                Toast.makeText(RegisterActivity.this, "The e-mail is badly formatted.", Toast.LENGTH_SHORT).show();
                             }
                             else{
                                 Log.w("RegisterActivity", "createUserWithEmail:failure", task.getException());
