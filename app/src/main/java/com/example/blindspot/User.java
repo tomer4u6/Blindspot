@@ -7,7 +7,7 @@ package com.example.blindspot;
  * Contains user information.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.3.0 (08/12/2019)
  */
 

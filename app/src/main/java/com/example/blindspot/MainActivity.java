@@ -1,6 +1,7 @@
 package com.example.blindspot;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.PendingIntent;
@@ -35,7 +36,7 @@ import static com.example.blindspot.FBref.refUsers;
  * or the Wardrobe screen.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.5.0 (20/12/2019)
  */
 
@@ -167,6 +168,16 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("speakText", true);
                 editor.commit();
             }
+        }
+
+        if (item.getItemId() == R.id.instructions){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Instructions");
+            builder.setMessage(getString(R.string.mainText));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }

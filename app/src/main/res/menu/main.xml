@@ -6,7 +6,14 @@
         android:title="Enable voice introduction"
         app:showAsAction="never"
         android:orderInCategory="0"
-        android:checkable="true" />
+        android:checkable="true"
+        />
+
+    <item
+        android:id="@+id/instructions"
+        android:title="View screen instructions"
+        android:orderInCategory="100"
+        />
 
 
 </menu>

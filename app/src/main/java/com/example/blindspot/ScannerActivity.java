@@ -40,12 +40,13 @@ import static com.example.blindspot.FBref.refWardrobe;
  * and share them with others.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.6.0 (09/01/2020)
  */
 
 public class ScannerActivity extends AppCompatActivity {
     TextView textView_clothInfo;
+
     String clothCode;
     String type,size,color,fullInfo,linkString;
     Long amount;
@@ -97,6 +98,7 @@ public class ScannerActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        menu.add("Open Wardrobe");
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
@@ -110,6 +112,7 @@ public class ScannerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String itemName = item.getTitle().toString();
         if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
@@ -127,6 +130,21 @@ public class ScannerActivity extends AppCompatActivity {
                 editor.putBoolean("speakText", true);
                 editor.commit();
             }
+        }
+        if (itemName.equals("Open Wardrobe")){
+            Intent intent = new Intent(ScannerActivity.this, WardrobeActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        if (item.getItemId() == R.id.instructions){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Instructions");
+            builder.setMessage(getString(R.string.scannerText));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }

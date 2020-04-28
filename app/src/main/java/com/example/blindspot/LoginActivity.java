@@ -1,6 +1,7 @@
 package com.example.blindspot;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.PendingIntent;
@@ -36,7 +37,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The login screen where the user can login to the application.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.4.0 (15/12/2019)
  */
 
@@ -135,6 +136,17 @@ public class LoginActivity extends AppCompatActivity {
                 editor.commit();
             }
         }
+
+        if (item.getItemId() == R.id.instructions){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Instructions");
+            builder.setMessage(getString(R.string.loginText));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

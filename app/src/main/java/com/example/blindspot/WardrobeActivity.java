@@ -24,7 +24,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,7 +33,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -48,7 +46,7 @@ import static com.example.blindspot.FBref.refAuth;
  * The wardrobe screen where the user can handle his wardrobe.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.9.0 (26/01/2020)
  */
 
@@ -195,6 +193,7 @@ public class WardrobeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        menu.add("Open Scanner");
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
@@ -208,6 +207,7 @@ public class WardrobeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String itemName = item.getTitle().toString();
         if(item.getItemId() == R.id.textToSpeech_Checkbox){
             SharedPreferences settings = getSharedPreferences("PREFS_NAME", MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
@@ -225,6 +225,21 @@ public class WardrobeActivity extends AppCompatActivity {
                 editor.putBoolean("speakText", true);
                 editor.commit();
             }
+        }
+        if (itemName.equals("Open Scanner")){
+            Intent intent = new Intent(WardrobeActivity.this, ScannerActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        if (item.getItemId() == R.id.instructions){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Instructions");
+            builder.setMessage(getString(R.string.wardrobeText));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }

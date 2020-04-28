@@ -1,6 +1,7 @@
 package com.example.blindspot;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.PendingIntent;
@@ -40,7 +41,7 @@ import static com.example.blindspot.FBref.refUsers;
  * The register screen where the user can register to the application.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.3.0 (08/12/2019)
  */
 
@@ -151,6 +152,17 @@ public class RegisterActivity extends AppCompatActivity {
                 editor.commit();
             }
         }
+
+        if (item.getItemId() == R.id.instructions){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Instructions");
+            builder.setMessage(getString(R.string.registerText));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

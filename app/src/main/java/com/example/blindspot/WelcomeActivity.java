@@ -34,7 +34,7 @@ import java.util.Locale;
  * where the user can move to the register screen or the login screen.
  *
  * @author Tomer Ben Ari
- * @version 1.1.1
+ * @version 1.1.2
  * @since 0.2.0 (05/12/2019)
  */
 
@@ -102,6 +102,7 @@ public class WelcomeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.add("About");
+        menu.removeItem(R.id.instructions);
         menu.getItem(0).setChecked(isToSpeak);
         return super.onCreateOptionsMenu(menu);
     }
