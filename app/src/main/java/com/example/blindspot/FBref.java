@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * Contains Firebase references.
  *
  * @author Tomer Ben Ari
- * @version 1.1.2
+ * @version 1.1.3
  * @since 0.3.0 (08/12/2019)
  */
 

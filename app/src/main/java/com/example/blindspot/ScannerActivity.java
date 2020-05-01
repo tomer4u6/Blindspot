@@ -40,7 +40,7 @@ import static com.example.blindspot.FBref.refWardrobe;
  * and share them with others.
  *
  * @author Tomer Ben Ari
- * @version 1.1.2
+ * @version 1.1.3
  * @since 0.6.0 (09/01/2020)
  */
 
